@@ -20,7 +20,25 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Generate Button (mini, inside badge) ───────────── */
+    /* ── Date Editable ──────────────────────────────────── */
+    .date-edit-wrap { display: inline-flex; align-items: center; gap: 6px; }
+    .date-display {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a1a;
+      cursor: pointer;
+      border-bottom: 1.5px dashed #00AA5B;
+      padding-bottom: 1px;
+      transition: color .15s;
+    }
+    .date-display:hover { color: #00AA5B; }
+    #datePicker {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      width: 0; height: 0;
+      border: none;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
     .gen-mini-btn {
       display: inline-flex;
@@ -588,7 +606,10 @@
           </div>
           <div class="info-item">
             <label>Tanggal Pembelian</label>
-            <p>13 Maret 2026</p>
+            <div class="date-edit-wrap">
+              <span id="dateDisplay" class="date-display" onclick="openDatePicker()" title="Klik untuk ubah tanggal">13 Maret 2026</span>
+              <input type="date" id="datePicker" value="2026-03-13" onchange="onDateChange(this)" />
+            </div>
           </div>
           <div class="info-item">
             <label>Metode Pembayaran</label>
@@ -887,6 +908,21 @@
     // Mobile card
     if (e.target.matches(".product-cards .card-field")) handleCardInput(e.target);
   });
+
+  // ── Date picker ──────────────────────────────────────────────
+  const BULAN = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+  function openDatePicker() {
+    const dp = document.getElementById("datePicker");
+    dp.style.pointerEvents = "auto";
+    dp.showPicker ? dp.showPicker() : dp.click();
+    dp.style.pointerEvents = "none";
+  }
+
+  function onDateChange(input) {
+    const [y, m, d] = input.value.split("-");
+    document.getElementById("dateDisplay").textContent = `${parseInt(d)} ${BULAN[parseInt(m)-1]} ${y}`;
+  }
 
   // ── Generate random invoice number ──────────────────────────
   let currentInvoiceNo = "739202623105645329";
