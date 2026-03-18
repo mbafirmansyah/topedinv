@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Invoice Tokopedia — #739202623105645329</title>
+  <style>
+    /* ── Reset & Base ───────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+      background: #f0f2f7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 56px;
+      color: #222;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Generate Button (mini, inside badge) ───────────── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .gen-mini-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.18);
+      border: 1.2px solid rgba(255,255,255,0.45);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 12px;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      transition: background .15s, transform .15s;
+      flex-shrink: 0;
+      padding: 0;
+      line-height: 1;
+    }
+    .gen-mini-btn:hover { background: rgba(255,255,255,0.32); transform: scale(1.12); }
+    .gen-mini-btn:active { transform: scale(0.93); }
+    .gen-mini-btn.spinning { animation: spin .35s ease; }
+
+    /* ── Card ───────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+      width: 100%;
+      max-width: 700px;
+      overflow: hidden;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #00c968 0%, #007a3d 100%);
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .logo-box {
+      background: #fff;
+      border-radius: 10px;
+      padding: 6px 12px;
+      flex-shrink: 0;
+    }
+    .logo-box span {
+      font-size: 16px;
+      font-weight: 900;
+      color: #00AA5B;
+      letter-spacing: -0.5px;
+      white-space: nowrap;
+    }
+    .header-title { min-width: 0; }
+    .header-title h1 {
+      color: #fff;
+      font-size: 17px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-title p {
+      color: rgba(255,255,255,0.75);
+      font-size: 11.5px;
+      margin-top: 2px;
+    }
+    .invoice-badge {
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.35);
+      border-radius: 10px;
+      padding: 8px 14px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .invoice-badge span {
+      display: block;
+      color: rgba(255,255,255,0.7);
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      margin-bottom: 3px;
+    }
+    .invoice-badge strong {
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      word-break: break-all;
+    }
+
+    /* ── Status Bar ─────────────────────────────────────── */
+    .status-bar {
+      background: #edfaf3;
+      padding: 9px 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #c8f0dc;
+    }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #00AA5B;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(0,170,91,0.18);
+    }
+    .status-bar p { font-size: 12px; color: #006e36; font-weight: 600; }
+
+    /* ── Body ───────────────────────────────────────────── */
+    .body { padding: 22px 28px; }
+
+    .section { margin-bottom: 24px; }
+    .section-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: #999;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px; height: 12px;
+      background: #00AA5B;
+      border-radius: 2px;
+    }
+
+    /* ── Info Grid ──────────────────────────────────────── */
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .info-item label {
+      font-size: 10px;
+      color: #bbb;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+    .info-item p {
+      font-size: 13px;
+      color: #1a1a1a;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+    .payment-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f2f4f9;
+      border-radius: 8px;
+      padding: 7px 12px;
+      margin-top: 2px;
+    }
+    .payment-icon {
+      width: 32px; height: 20px;
+      background: #003d99;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .payment-icon span { color: #fff; font-size: 7.5px; font-weight: 900; }
+    .payment-chip p { font-size: 12.5px; font-weight: 700; color: #1a1a1a; }
+
+    /* ── Address Block ──────────────────────────────────── */
+    .address-block {
+      background: #f8f9fc;
+      border-radius: 10px;
+      padding: 14px 16px;
+      border-left: 3px solid #00AA5B;
+    }
+    .address-block .name-row { font-size: 13.5px; font-weight: 700; color: #1a1a1a; margin-bottom: 2px; }
+    .address-block .phone-row { font-size: 12px; color: #00AA5B; font-weight: 600; margin-bottom: 7px; }
+    .address-block .addr-text { font-size: 12px; color: #555; line-height: 1.65; }
+
+    /* ── Product Table — DESKTOP ────────────────────────── */
+    .product-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
+    .product-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 440px;
+    }
+    .product-table thead tr { background: #f4f7fb; }
+    .product-table thead th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #999;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .product-table thead th:not(:first-child) { text-align: right; }
+    .product-table tbody td {
+      padding: 14px 12px;
+      vertical-align: middle;
+      border-bottom: 1px solid #f4f4f4;
+    }
+    .product-table tbody td:not(:first-child) { text-align: right; }
+    .product-table tbody tr:last-child td { border-bottom: none; }
+
+    /* ── Product Cards — MOBILE ─────────────────────────── */
+    .product-cards { display: none; }
+    .product-card {
+      background: #f8f9fc;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+      border: 1px solid #eef0f5;
+      position: relative;
+    }
+    .product-card .pc-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1.45;
+      margin-bottom: 10px;
+      padding-right: 28px;
+    }
+    .product-card .pc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      margin-top: 6px;
+    }
+    .product-card .pc-label { color: #888; font-weight: 500; }
+    .product-card .pc-val { font-weight: 700; color: #222; }
+    .product-card .pc-total {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .product-card .pc-total-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
+    .product-card .pc-total-val { font-size: 15px; font-weight: 800; color: #00AA5B; }
+    .product-card .del-card-btn {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: #fff0f0;
+      border: none;
+      color: #f44336;
+      font-size: 14px;
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      transition: background .15s;
+    }
+    .product-card .del-card-btn:hover { background: #ffd7d7; }
+
+    /* ── Editable Field styles ──────────────────────────── */
+    .product-name { font-weight: 700; color: #1a1a1a; font-size: 13px; line-height: 1.4; }
+    .qty-badge {
+      display: inline-block;
+      background: #e8f9f0;
+      color: #007a40;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 6px;
+      padding: 2px 10px;
+    }
+    .unit-price { font-size: 13px; color: #444; font-weight: 600; }
+    .total-price { font-size: 13.5px; color: #1a1a1a; font-weight: 800; }
+
+    .del-row-btn {
+      background: none; border: none;
+      color: #f44336; font-size: 15px;
+      cursor: pointer; padding: 2px 5px;
+      opacity: 0; transition: opacity .15s;
+      line-height: 1;
+    }
+    tr:hover .del-row-btn { opacity: 1; }
+
+    input.editable-field {
+      border: none; outline: none;
+      background: transparent;
+      font-family: inherit;
+      color: inherit;
+      font-weight: inherit;
+      font-size: inherit;
+      width: 100%;
+      padding: 0;
+      cursor: pointer;
+      caret-color: #00AA5B;
+      transition: background .15s, border-color .15s;
+      border-radius: 4px;
+    }
+    input.editable-field.active {
+      background: #f0fdf6;
+      border-bottom: 2px solid #00AA5B !important;
+      padding: 3px 6px;
+      cursor: text;
+      border-radius: 4px 4px 0 0;
+    }
+    input.editable-field[type="number"] {
+      -moz-appearance: textfield;
+      max-width: 90px;
+      text-align: right;
+    }
+    input.editable-field[type="number"]::-webkit-inner-spin-button,
+    input.editable-field[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    /* Mobile editable field in card */
+    .pc-editable-wrap { display: flex; align-items: center; gap: 6px; flex: 1; }
+    input.card-field {
+      border: 1.5px solid #e0e0e0;
+      outline: none;
+      background: #fff;
+      font-family: inherit;
+      color: #1a1a1a;
+      font-weight: 700;
+      font-size: 13px;
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: 8px;
+      caret-color: #00AA5B;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input.card-field:focus {
+      border-color: #00AA5B;
+      box-shadow: 0 0 0 3px rgba(0,170,91,0.12);
+    }
+    input.card-field[type="number"] {
+      -moz-appearance: textfield;
+      text-align: right;
+      max-width: 100px;
+    }
+    input.card-field[type="number"]::-webkit-inner-spin-button,
+    input.card-field[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    .edit-hint {
+      font-size: 11px;
+      color: #bbb;
+      text-align: center;
+      margin-top: 8px;
+    }
+    .add-row-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: 1.5px dashed #00AA5B;
+      color: #00AA5B;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background .15s;
+      width: 100%;
+      justify-content: center;
+    }
+    .add-row-btn:hover, .add-row-btn:active { background: #e8f9f0; }
+
+    /* ── Cost Summary ───────────────────────────────────── */
+    .cost-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed #f0f0f0;
+      gap: 12px;
+    }
+    .cost-row:last-child { border-bottom: none; }
+    .cost-label { color: #555; font-size: 13px; line-height: 1.4; }
+    .cost-value { font-weight: 700; color: #222; font-size: 13px; white-space: nowrap; }
+    .cost-value.discount { color: #00AA5B; }
+    .cost-value.neutral { color: #888; }
+    .divider { border: none; border-top: 1.5px solid #f0f0f0; margin: 10px 0; }
+
+    .grand-total-box {
+      background: linear-gradient(135deg, #00c968 0%, #007a3d 100%);
+      border-radius: 14px;
+      padding: 16px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      gap: 12px;
+    }
+    .grand-total-box .gt-label {
+      color: rgba(255,255,255,0.85);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .grand-total-box .gt-amount {
+      color: #fff;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    /* ── Promo Note ─────────────────────────────────────── */
+    .promo-note {
+      background: #fffbe6;
+      border: 1.2px solid #ffe066;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 12px;
+      color: #7a5f00;
+      line-height: 1.6;
+      margin-top: 10px;
+    }
+    .promo-note strong { color: #b28900; }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    .footer {
+      background: #f8f9fc;
+      border-top: 1.5px solid #eee;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .footer p { font-size: 11.5px; color: #aaa; line-height: 1.5; }
+    .footer .care-link {
+      color: #00AA5B;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .footer .care-link:hover { text-decoration: underline; }
+
+    /* ── Action Buttons ─────────────────────────────────── */
+    .actions {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      flex: 1;
+      min-width: 130px;
+      padding: 13px 20px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all .18s;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-primary { background: #00AA5B; color: #fff; box-shadow: 0 4px 14px rgba(0,170,91,0.20); }
+    .btn-primary:hover { background: #008a48; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,170,91,0.28); }
+    .btn-outline { background: #fff; color: #00AA5B; border: 2px solid #00AA5B; }
+    .btn-outline:hover { background: #e8f9f0; transform: translateY(-1px); }
+    .btn:active { transform: scale(0.97); }
+
+    /* ── Responsive: Tablet ─────────────────────────────── */
+    @media (max-width: 640px) {
+      body { padding: 16px 10px 60px; }
+      .header { padding: 18px 18px 16px; gap: 12px; }
+      .logo-box span { font-size: 14px; }
+      .header-title h1 { font-size: 15px; }
+      .invoice-badge { padding: 7px 11px; }
+      .invoice-badge strong { font-size: 10px; }
+      .status-bar { padding: 9px 18px; }
+      .body { padding: 18px 16px; }
+      .info-grid { grid-template-columns: 1fr; gap: 12px; }
+      .footer { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 4px; }
+      .grand-total-box .gt-amount { font-size: 19px; }
+      .actions { gap: 8px; }
+      .btn { font-size: 13px; padding: 12px 14px; }
+    }
+
+    /* ── Responsive: Mobile — switch table → cards ──────── */
+    @media (max-width: 480px) {
+      .product-table-wrap { display: none; }
+      .product-cards { display: block; }
+      .edit-hint { display: none; }
+      .grand-total-box { flex-direction: column; align-items: flex-start; gap: 4px; padding: 14px 18px; }
+      .grand-total-box .gt-amount { font-size: 22px; }
+      .actions { flex-direction: column; }
+      .btn { min-width: unset; width: 100%; }
+      .header { flex-direction: column; align-items: flex-start; }
+      .invoice-badge { text-align: left; width: 100%; }
+      .cost-label { font-size: 12px; }
+      .cost-value { font-size: 12.5px; }
+    }
+
+    /* ── Print ──────────────────────────────────────────── */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .card { box-shadow: none; border-radius: 0; max-width: 100%; }
+      .actions, .add-row-btn, .edit-hint, .del-row-btn, .del-card-btn, .gen-mini-btn { display: none !important; }
+      .product-table-wrap { display: block !important; }
+      .product-cards { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="header-left">
+        <div class="logo-box"><span>tokopedia</span></div>
+        <div class="header-title">
+          <h1>Invoice Pembelian</h1>
+          <p>Diterbitkan secara otomatis oleh sistem</p>
+        </div>
+      </div>
+      <div class="invoice-badge">
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
+          <span style="margin-bottom:0;">No. Invoice</span>
+          <button class="gen-mini-btn" id="genBtn" onclick="generateInvoiceNo()" title="Generate No. Invoice baru">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+          </button>
+        </div>
+        <strong id="invoiceNoDisplay">739202623105645329</strong>
+      </div>
+    </div>
+
+    <!-- STATUS -->
+    <div class="status-bar">
+      <div class="status-dot"></div>
+      <p>Invoice sah dan diproses oleh komputer</p>
+    </div>
+
+    <div class="body">
+
+      <!-- INFORMASI TRANSAKSI -->
+      <div class="section">
+        <p class="section-title">Informasi Transaksi</p>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Penjual</label>
+            <p>JCTech.Indonesia</p>
+          </div>
+          <div class="info-item">
+            <label>Pembeli</label>
+            <p>Muhammad Bagus Aldin Firmansyah</p>
+          </div>
+          <div class="info-item">
+            <label>Tanggal Pembelian</label>
+            <p>13 Maret 2026</p>
+          </div>
+          <div class="info-item">
+            <label>Metode Pembayaran</label>
+            <div class="payment-chip">
+              <div class="payment-icon"><span>BCA</span></div>
+              <p>BCA Virtual Account</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALAMAT PENGIRIMAN -->
+      <div class="section">
+        <p class="section-title">Alamat Pengiriman</p>
+        <div class="address-block">
+          <p class="name-row">Bagus</p>
+          <p class="phone-row">(+62) 878 8800 0575</p>
+          <p class="addr-text">
+            PT. Asia Paramita Indah Jl. Perniagaan Bar. No.12, RT.12/RW.1,
+            Roa Malaka, Kec. Tambora, Kota Jakarta Barat,
+            DKI Jakarta 11230
+          </p>
+        </div>
+      </div>
+
+      <!-- PRODUK: TABLE (Desktop) -->
+      <div class="section">
+        <p class="section-title">Info Produk</p>
+
+        <!-- Desktop Table -->
+        <div class="product-table-wrap">
+          <table class="product-table" id="productTable">
+            <thead>
+              <tr>
+                <th style="border-radius:8px 0 0 8px; min-width:200px;">Produk</th>
+                <th style="min-width:70px;">Jumlah</th>
+                <th style="min-width:110px;">Harga Satuan</th>
+                <th style="min-width:110px; border-radius:0 8px 8px 0;">Total Harga</th>
+                <th style="width:30px;"></th>
+              </tr>
+            </thead>
+            <tbody id="productBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="product-cards" id="productCards"></div>
+
+        <button class="add-row-btn" onclick="addRow()">＋ Tambah Produk</button>
+        <p class="edit-hint">✏️ Klik nama, jumlah, atau harga untuk mengedit langsung</p>
+      </div>
+
+      <!-- RINCIAN BIAYA -->
+      <div class="section">
+        <p class="section-title">Rincian Biaya</p>
+        <div class="cost-row">
+          <span class="cost-label">Total Harga (<span id="itemCount">2</span> Barang)</span>
+          <span class="cost-value" id="subtotalDisplay">Rp900.000</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-label">Total Ongkos Kirim</span>
+          <span class="cost-value">Rp18.000</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-label">Diskon Ongkos Kirim PLUS dari Platform</span>
+          <span class="cost-value discount">− Rp18.000</span>
+        </div>
+        <div class="cost-row">
+          <span class="cost-label">Biaya Asuransi Pengiriman</span>
+          <span class="cost-value neutral">Rp3.000</span>
+        </div>
+        <hr class="divider">
+        <div class="grand-total-box">
+          <span class="gt-label">Total Tagihan</span>
+          <span class="gt-amount" id="grandTotalDisplay">Rp903.000</span>
+        </div>
+      </div>
+
+      <!-- PROMO -->
+      <div class="promo-note">
+        ⚡ <strong>Promo yang didapat bisa berubah.</strong> Cek Syarat &amp; Ketentuan Promo Tokopedia — Diskon Pengiriman PLUS Rp18.000* berlaku sesuai kebijakan platform.
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <p>Hubungi <a href="#" class="care-link">Tokopedia Care</a> jika membutuhkan bantuan.</p>
+      <p style="color:#ddd;">© 2026 Tokopedia</p>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Invoice</button>
+    <button class="btn btn-outline" onclick="copyInvoice()">📋 Salin No. Invoice</button>
+  </div>
+
+<script>
+  // ── Data ────────────────────────────────────────────────────
+  let products = [
+    { name: "Ruijie Reyee RG-ES105GD 5-Port Gigabit Unmanaged Desktop Switch", qty: 2, price: 450000 }
+  ];
+  const SHIPPING = 18000, DISC_SHIP = 18000, INSURANCE = 3000;
+
+  // ── Helpers ─────────────────────────────────────────────────
+  function fmtRp(v) { return "Rp" + parseInt(v).toLocaleString("id-ID"); }
+  function isMobile() { return window.innerWidth <= 480; }
+
+  // ── Recalc ──────────────────────────────────────────────────
+  function recalc() {
+    let sub = 0, qty = 0;
+    products.forEach((p, i) => {
+      sub += p.qty * p.price;
+      qty += p.qty;
+      const el = document.getElementById("rt_" + i);
+      if (el) el.textContent = fmtRp(p.qty * p.price);
+      const cel = document.getElementById("crt_" + i);
+      if (cel) cel.textContent = fmtRp(p.qty * p.price);
+    });
+    document.getElementById("subtotalDisplay").textContent = fmtRp(sub);
+    document.getElementById("grandTotalDisplay").textContent = fmtRp(sub + SHIPPING - DISC_SHIP + INSURANCE);
+    document.getElementById("itemCount").textContent = qty;
+  }
+
+  // ── Render desktop table row ─────────────────────────────────
+  function buildTableRow(p, i) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <input class="editable-field product-name" type="text"
+          value="${escHtml(p.name)}" data-idx="${i}" data-field="name"
+          title="Klik untuk edit" readonly/>
+      </td>
+      <td>
+        <input class="editable-field qty-badge" type="text"
+          value="× ${p.qty}" data-idx="${i}" data-field="qty"
+          style="max-width:54px;text-align:center;" title="Klik untuk edit" readonly/>
+      </td>
+      <td>
+        <input class="editable-field unit-price" type="text"
+          value="${fmtRp(p.price)}" data-idx="${i}" data-field="price"
+          style="max-width:100px;text-align:right;" title="Klik untuk edit" readonly/>
+      </td>
+      <td><span class="total-price" id="rt_${i}">${fmtRp(p.qty * p.price)}</span></td>
+      <td><button class="del-row-btn" data-idx="${i}" title="Hapus">✕</button></td>
+    `;
+    return tr;
+  }
+
+  // ── Render mobile card ───────────────────────────────────────
+  function buildCard(p, i) {
+    const div = document.createElement("div");
+    div.className = "product-card";
+    div.dataset.idx = i;
+    div.innerHTML = `
+      <button class="del-card-btn" data-idx="${i}" title="Hapus">✕</button>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:.9px;font-weight:700;margin-bottom:4px;">Nama Produk</div>
+        <input class="card-field" type="text" value="${escHtml(p.name)}" data-idx="${i}" data-field="name" placeholder="Nama produk..."/>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:100px;">
+          <div style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:.9px;font-weight:700;margin-bottom:4px;">Jumlah</div>
+          <input class="card-field" type="number" value="${p.qty}" min="1" data-idx="${i}" data-field="qty" style="max-width:100%;"/>
+        </div>
+        <div style="flex:2;min-width:140px;">
+          <div style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:.9px;font-weight:700;margin-bottom:4px;">Harga Satuan (Rp)</div>
+          <input class="card-field" type="number" value="${p.price}" min="0" data-idx="${i}" data-field="price" style="max-width:100%;"/>
+        </div>
+      </div>
+      <div class="pc-total">
+        <span class="pc-total-label">Total</span>
+        <span class="pc-total-val" id="crt_${i}">${fmtRp(p.qty * p.price)}</span>
+      </div>
+    `;
+    return div;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  // ── Render all ───────────────────────────────────────────────
+  function renderAll() {
+    const tbody = document.getElementById("productBody");
+    const cards = document.getElementById("productCards");
+    tbody.innerHTML = "";
+    cards.innerHTML = "";
+    products.forEach((p, i) => {
+      tbody.appendChild(buildTableRow(p, i));
+      cards.appendChild(buildCard(p, i));
+    });
+    recalc();
+  }
+
+  // ── Desktop table: activate / commit ─────────────────────────
+  function activateDesktop(inp) {
+    inp.classList.add("active");
+    inp.readOnly = false;
+    const idx = +inp.dataset.idx, field = inp.dataset.field;
+    if (field === "qty") inp.value = products[idx].qty;
+    if (field === "price") inp.value = products[idx].price;
+    inp.focus(); inp.select();
+  }
+
+  function commitDesktop(inp) {
+    inp.classList.remove("active");
+    inp.readOnly = true;
+    const idx = +inp.dataset.idx, field = inp.dataset.field;
+    const raw = inp.value;
+    if (field === "name")  products[idx].name  = raw.trim() || products[idx].name;
+    else if (field === "qty")   { const v = parseInt(raw);   products[idx].qty   = (!v || v < 1) ? 1 : v; }
+    else if (field === "price") { const v = parseFloat(raw); products[idx].price = (isNaN(v) || v < 0) ? 0 : v; }
+    // Restore display format
+    if (field === "qty")   inp.value = "× " + products[idx].qty;
+    if (field === "price") inp.value = fmtRp(products[idx].price);
+    recalc();
+  }
+
+  // ── Mobile card: live update on input ───────────────────────
+  function handleCardInput(inp) {
+    const idx = +inp.dataset.idx, field = inp.dataset.field;
+    if (field === "name")  products[idx].name  = inp.value;
+    else if (field === "qty")   { const v = parseInt(inp.value);   products[idx].qty   = (!v || v < 1) ? 1 : v; }
+    else if (field === "price") { const v = parseFloat(inp.value); products[idx].price = (isNaN(v) || v < 0) ? 0 : v; }
+    recalc();
+  }
+
+  // ── Add / Delete ─────────────────────────────────────────────
+  function addRow() {
+    products.push({ name: "Nama Produk Baru", qty: 1, price: 0 });
+    renderAll();
+    if (isMobile()) {
+      // focus name in last card
+      setTimeout(() => {
+        const all = document.querySelectorAll(".product-cards .card-field[data-field='name']");
+        if (all.length) { const last = all[all.length-1]; last.focus(); last.select(); }
+      }, 60);
+    } else {
+      setTimeout(() => {
+        const all = document.querySelectorAll("#productBody input[data-field='name']");
+        if (all.length) activateDesktop(all[all.length-1]);
+      }, 50);
+    }
+  }
+
+  function deleteRow(idx) {
+    if (products.length <= 1) { alert("Minimal harus ada 1 produk."); return; }
+    products.splice(idx, 1);
+    renderAll();
+  }
+
+  // ── Event delegation ─────────────────────────────────────────
+  document.addEventListener("click", e => {
+    // Desktop: click input
+    if (e.target.matches("#productBody input.editable-field")) {
+      activateDesktop(e.target);
+      return;
+    }
+    // Desktop: delete
+    if (e.target.matches("#productBody .del-row-btn")) {
+      deleteRow(+e.target.dataset.idx); return;
+    }
+    // Mobile: delete card
+    if (e.target.matches(".del-card-btn")) {
+      deleteRow(+e.target.dataset.idx); return;
+    }
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.target.matches("#productBody input.editable-field")) {
+      if (e.key === "Enter") e.target.blur();
+      if (e.key === "Escape") {
+        const inp = e.target, idx = +inp.dataset.idx, field = inp.dataset.field;
+        inp.classList.remove("active"); inp.readOnly = true;
+        if (field === "qty")   inp.value = "× " + products[idx].qty;
+        if (field === "price") inp.value = fmtRp(products[idx].price);
+        if (field === "name")  inp.value = products[idx].name;
+      }
+    }
+  });
+
+  document.addEventListener("blur", e => {
+    if (e.target.matches("#productBody input.editable-field") && e.target.classList.contains("active"))
+      commitDesktop(e.target);
+  }, true);
+
+  document.addEventListener("input", e => {
+    // Desktop live calc
+    if (e.target.matches("#productBody input.editable-field") && e.target.classList.contains("active")) {
+      const idx = +e.target.dataset.idx, field = e.target.dataset.field;
+      if (field === "qty")   { const v = parseInt(e.target.value);   products[idx].qty   = (!v||v<1)?1:v; recalc(); }
+      if (field === "price") { const v = parseFloat(e.target.value); products[idx].price = (isNaN(v)||v<0)?0:v; recalc(); }
+    }
+    // Mobile card
+    if (e.target.matches(".product-cards .card-field")) handleCardInput(e.target);
+  });
+
+  // ── Generate random invoice number ──────────────────────────
+  let currentInvoiceNo = "739202623105645329";
+
+  function generateInvoiceNo() {
+    const btn = document.getElementById("genBtn");
+    btn.classList.add("spinning");
+    setTimeout(() => btn.classList.remove("spinning"), 380);
+    // Generate 18-digit random number like Tokopedia format
+    let num = "";
+    for (let i = 0; i < 18; i++) {
+      num += i === 0 ? String(Math.floor(Math.random() * 9) + 1) : String(Math.floor(Math.random() * 10));
+    }
+    currentInvoiceNo = num;
+
+    const display = document.getElementById("invoiceNoDisplay");
+    // Animate: flash then show new number
+    display.style.transition = "opacity .15s";
+    display.style.opacity = "0";
+    setTimeout(() => {
+      display.textContent = currentInvoiceNo;
+      display.style.opacity = "1";
+    }, 160);
+  }
+
+  // ── Copy invoice ─────────────────────────────────────────────
+  function copyInvoice() {
+    navigator.clipboard.writeText(currentInvoiceNo).then(() => {
+      const btn = document.querySelector(".btn-outline");
+      const prev = btn.innerHTML;
+      btn.innerHTML = "✅ Tersalin!";
+      btn.style.background = "#e8f9f0";
+      setTimeout(() => { btn.innerHTML = prev; btn.style.background = ""; }, 2000);
+    });
+  }
+
+  // ── Init ─────────────────────────────────────────────────────
+  renderAll();
+</script>
+</body>
+</html>
