@@ -670,6 +670,19 @@
           <span class="cost-value" id="subtotalDisplay">Rp900.000</span>
         </div>
         <div class="cost-row">
+          <span class="cost-label">Kupon Diskon Barang dari Platform</span>
+          <span class="cost-value discount">
+            <span>− </span>
+            <span id="kuponDiskonDisplay" class="date-display" onclick="toggleKuponEdit()" title="Klik untuk ubah" style="color:#00AA5B;">Rp0</span>
+            <input type="number" id="kuponDiskonInput" min="0" value="0"
+              onblur="commitKupon()" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')cancelKupon();"
+              style="display:none;width:100px;text-align:right;font-size:13px;font-weight:700;color:#00AA5B;
+                     border:none;border-bottom:2px solid #00AA5B;outline:none;background:#f0fdf6;
+                     border-radius:4px 4px 0 0;padding:2px 6px;font-family:inherit;
+                     -moz-appearance:textfield;"/>
+          </span>
+        </div>
+        <div class="cost-row">
           <span class="cost-label">Total Ongkos Kirim</span>
           <span class="cost-value">Rp18.000</span>
         </div>
@@ -717,285 +730,182 @@
   </div>
 
 <script>
-  // ── Data ────────────────────────────────────────────────────
-  let products = [
-    { name: "Ruijie Reyee RG-ES105GD 5-Port Gigabit Unmanaged Desktop Switch", qty: 2, price: 450000 }
-  ];
-  const SHIPPING = 18000, DISC_SHIP = 18000;
-  let insurance = 3000;
+    // ── Data ─────────────────────────────────────────────────
+    let products = [
+      { name: "Adaptor Charger Laptop Acer 19V 3.42A 65W 5.5x1.7mm", qty: 1, price: 450000 },
+      { name: "Adaptor Charger Laptop Acer 19V 3.42A 65W 5.5x1.7mm", qty: 1, price: 450000 }
+    ];
 
-  // ── Helpers ─────────────────────────────────────────────────
-  function fmtRp(v) { return "Rp" + parseInt(v).toLocaleString("id-ID"); }
-  function isMobile() { return window.innerWidth <= 480; }
+    let shippingCost = 18000;
+    let shippingDiscount = 18000;
+    let insuranceCost = 3000;
+    let kuponDiskon = 0;
 
-  // ── Recalc ──────────────────────────────────────────────────
-  function recalc() {
-    let sub = 0, qty = 0;
-    products.forEach((p, i) => {
-      sub += p.qty * p.price;
-      qty += p.qty;
-      const el = document.getElementById("rt_" + i);
-      if (el) el.textContent = fmtRp(p.qty * p.price);
-      const cel = document.getElementById("crt_" + i);
-      if (cel) cel.textContent = fmtRp(p.qty * p.price);
-    });
-    document.getElementById("subtotalDisplay").textContent = fmtRp(sub);
-    document.getElementById("grandTotalDisplay").textContent = fmtRp(sub + SHIPPING - DISC_SHIP + insurance);
-    document.getElementById("itemCount").textContent = qty;
-  }
+    // ── Helpers ──────────────────────────────────────────────
+    const fmt = n => "Rp" + Number(n).toLocaleString("id-ID");
+    const fmtDate = d => {
+      const m = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+      return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
+    };
 
-  // ── Render desktop table row ─────────────────────────────────
-  function buildTableRow(p, i) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>
-        <input class="editable-field product-name" type="text"
-          value="${escHtml(p.name)}" data-idx="${i}" data-field="name"
-          title="Klik untuk edit" readonly/>
-      </td>
-      <td>
-        <input class="editable-field qty-badge" type="text"
-          value="× ${p.qty}" data-idx="${i}" data-field="qty"
-          style="max-width:54px;text-align:center;" title="Klik untuk edit" readonly/>
-      </td>
-      <td>
-        <input class="editable-field unit-price" type="text"
-          value="${fmtRp(p.price)}" data-idx="${i}" data-field="price"
-          style="max-width:100px;text-align:right;" title="Klik untuk edit" readonly/>
-      </td>
-      <td><span class="total-price" id="rt_${i}">${fmtRp(p.qty * p.price)}</span></td>
-      <td><button class="del-row-btn" data-idx="${i}" title="Hapus">✕</button></td>
-    `;
-    return tr;
-  }
-
-  // ── Render mobile card ───────────────────────────────────────
-  function buildCard(p, i) {
-    const div = document.createElement("div");
-    div.className = "product-card";
-    div.dataset.idx = i;
-    div.innerHTML = `
-      <button class="del-card-btn" data-idx="${i}" title="Hapus">✕</button>
-      <div style="margin-bottom:8px;">
-        <div style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:.9px;font-weight:700;margin-bottom:4px;">Nama Produk</div>
-        <input class="card-field" type="text" value="${escHtml(p.name)}" data-idx="${i}" data-field="name" placeholder="Nama produk..."/>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:100px;">
-          <div style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:.9px;font-weight:700;margin-bottom:4px;">Jumlah</div>
-          <input class="card-field" type="number" value="${p.qty}" min="1" data-idx="${i}" data-field="qty" style="max-width:100%;"/>
-        </div>
-        <div style="flex:2;min-width:140px;">
-          <div style="font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:.9px;font-weight:700;margin-bottom:4px;">Harga Satuan (Rp)</div>
-          <input class="card-field" type="number" value="${p.price}" min="0" data-idx="${i}" data-field="price" style="max-width:100%;"/>
-        </div>
-      </div>
-      <div class="pc-total">
-        <span class="pc-total-label">Total</span>
-        <span class="pc-total-val" id="crt_${i}">${fmtRp(p.qty * p.price)}</span>
-      </div>
-    `;
-    return div;
-  }
-
-  function escHtml(s) {
-    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-  }
-
-  // ── Render all ───────────────────────────────────────────────
-  function renderAll() {
-    const tbody = document.getElementById("productBody");
-    const cards = document.getElementById("productCards");
-    tbody.innerHTML = "";
-    cards.innerHTML = "";
-    products.forEach((p, i) => {
-      tbody.appendChild(buildTableRow(p, i));
-      cards.appendChild(buildCard(p, i));
-    });
-    recalc();
-  }
-
-  // ── Desktop table: activate / commit ─────────────────────────
-  function activateDesktop(inp) {
-    inp.classList.add("active");
-    inp.readOnly = false;
-    const idx = +inp.dataset.idx, field = inp.dataset.field;
-    if (field === "qty") inp.value = products[idx].qty;
-    if (field === "price") inp.value = products[idx].price;
-    inp.focus(); inp.select();
-  }
-
-  function commitDesktop(inp) {
-    inp.classList.remove("active");
-    inp.readOnly = true;
-    const idx = +inp.dataset.idx, field = inp.dataset.field;
-    const raw = inp.value;
-    if (field === "name")  products[idx].name  = raw.trim() || products[idx].name;
-    else if (field === "qty")   { const v = parseInt(raw);   products[idx].qty   = (!v || v < 1) ? 1 : v; }
-    else if (field === "price") { const v = parseFloat(raw); products[idx].price = (isNaN(v) || v < 0) ? 0 : v; }
-    // Restore display format
-    if (field === "qty")   inp.value = "× " + products[idx].qty;
-    if (field === "price") inp.value = fmtRp(products[idx].price);
-    recalc();
-  }
-
-  // ── Mobile card: live update on input ───────────────────────
-  function handleCardInput(inp) {
-    const idx = +inp.dataset.idx, field = inp.dataset.field;
-    if (field === "name")  products[idx].name  = inp.value;
-    else if (field === "qty")   { const v = parseInt(inp.value);   products[idx].qty   = (!v || v < 1) ? 1 : v; }
-    else if (field === "price") { const v = parseFloat(inp.value); products[idx].price = (isNaN(v) || v < 0) ? 0 : v; }
-    recalc();
-  }
-
-  // ── Add / Delete ─────────────────────────────────────────────
-  function addRow() {
-    products.push({ name: "Nama Produk Baru", qty: 1, price: 0 });
-    renderAll();
-    if (isMobile()) {
-      // focus name in last card
-      setTimeout(() => {
-        const all = document.querySelectorAll(".product-cards .card-field[data-field='name']");
-        if (all.length) { const last = all[all.length-1]; last.focus(); last.select(); }
-      }, 60);
-    } else {
-      setTimeout(() => {
-        const all = document.querySelectorAll("#productBody input[data-field='name']");
-        if (all.length) activateDesktop(all[all.length-1]);
-      }, 50);
-    }
-  }
-
-  function deleteRow(idx) {
-    if (products.length <= 1) { alert("Minimal harus ada 1 produk."); return; }
-    products.splice(idx, 1);
-    renderAll();
-  }
-
-  // ── Event delegation ─────────────────────────────────────────
-  document.addEventListener("click", e => {
-    // Desktop: click input
-    if (e.target.matches("#productBody input.editable-field")) {
-      activateDesktop(e.target);
-      return;
-    }
-    // Desktop: delete
-    if (e.target.matches("#productBody .del-row-btn")) {
-      deleteRow(+e.target.dataset.idx); return;
-    }
-    // Mobile: delete card
-    if (e.target.matches(".del-card-btn")) {
-      deleteRow(+e.target.dataset.idx); return;
-    }
-  });
-
-  document.addEventListener("keydown", e => {
-    if (e.target.matches("#productBody input.editable-field")) {
-      if (e.key === "Enter") e.target.blur();
-      if (e.key === "Escape") {
-        const inp = e.target, idx = +inp.dataset.idx, field = inp.dataset.field;
-        inp.classList.remove("active"); inp.readOnly = true;
-        if (field === "qty")   inp.value = "× " + products[idx].qty;
-        if (field === "price") inp.value = fmtRp(products[idx].price);
-        if (field === "name")  inp.value = products[idx].name;
+    // ── Date Picker ──────────────────────────────────────────
+    function openDatePicker() { document.getElementById("datePicker").showPicker(); }
+    function onDateChange(el) {
+      if (el.value) {
+        const parts = el.value.split("-");
+        const d = new Date(+parts[0], +parts[1]-1, +parts[2]);
+        document.getElementById("dateDisplay").textContent = fmtDate(d);
       }
     }
-  });
 
-  document.addEventListener("blur", e => {
-    if (e.target.matches("#productBody input.editable-field") && e.target.classList.contains("active"))
-      commitDesktop(e.target);
-  }, true);
-
-  document.addEventListener("input", e => {
-    // Desktop live calc
-    if (e.target.matches("#productBody input.editable-field") && e.target.classList.contains("active")) {
-      const idx = +e.target.dataset.idx, field = e.target.dataset.field;
-      if (field === "qty")   { const v = parseInt(e.target.value);   products[idx].qty   = (!v||v<1)?1:v; recalc(); }
-      if (field === "price") { const v = parseFloat(e.target.value); products[idx].price = (isNaN(v)||v<0)?0:v; recalc(); }
+    // ── Invoice Generator ────────────────────────────────────
+    function generateInvoiceNo() {
+      const btn = document.getElementById("genBtn");
+      btn.classList.add("spinning");
+      let s = "";
+      for (let i = 0; i < 18; i++) s += Math.floor(Math.random() * 10);
+      document.getElementById("invoiceNoDisplay").textContent = s;
+      setTimeout(() => btn.classList.remove("spinning"), 350);
     }
-    // Mobile card
-    if (e.target.matches(".product-cards .card-field")) handleCardInput(e.target);
-  });
 
-  // ── Insurance edit ───────────────────────────────────────────
-  function toggleInsuranceEdit() {
-    const disp = document.getElementById("insuranceDisplay");
-    const inp  = document.getElementById("insuranceInput");
-    disp.style.display = "none";
-    inp.style.display  = "inline-block";
-    inp.value = insurance;
-    inp.focus(); inp.select();
-  }
-  function commitInsurance() {
-    const inp  = document.getElementById("insuranceInput");
-    const disp = document.getElementById("insuranceDisplay");
-    const v = parseFloat(inp.value);
-    insurance = (isNaN(v) || v < 0) ? 0 : Math.round(v);
-    disp.textContent   = fmtRp(insurance);
-    disp.style.display = "inline";
-    inp.style.display  = "none";
-    recalc();
-  }
-  function cancelInsurance() {
-    const inp  = document.getElementById("insuranceInput");
-    const disp = document.getElementById("insuranceDisplay");
-    disp.style.display = "inline";
-    inp.style.display  = "none";
-  }
-
-  // ── Date picker ──────────────────────────────────────────────
-  const BULAN = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-
-  function openDatePicker() {
-    const dp = document.getElementById("datePicker");
-    dp.style.pointerEvents = "auto";
-    dp.showPicker ? dp.showPicker() : dp.click();
-    dp.style.pointerEvents = "none";
-  }
-
-  function onDateChange(input) {
-    const [y, m, d] = input.value.split("-");
-    document.getElementById("dateDisplay").textContent = `${parseInt(d)} ${BULAN[parseInt(m)-1]} ${y}`;
-  }
-
-  // ── Generate random invoice number ──────────────────────────
-  let currentInvoiceNo = "739202623105645329";
-
-  function generateInvoiceNo() {
-    const btn = document.getElementById("genBtn");
-    btn.classList.add("spinning");
-    setTimeout(() => btn.classList.remove("spinning"), 380);
-    // Generate 18-digit random number like Tokopedia format
-    let num = "";
-    for (let i = 0; i < 18; i++) {
-      num += i === 0 ? String(Math.floor(Math.random() * 9) + 1) : String(Math.floor(Math.random() * 10));
+    // ── Insurance Edit ───────────────────────────────────────
+    function toggleInsuranceEdit() {
+      document.getElementById("insuranceDisplay").style.display = "none";
+      const inp = document.getElementById("insuranceInput");
+      inp.style.display = "inline-block";
+      inp.focus();
+      inp.select();
     }
-    currentInvoiceNo = num;
+    function commitInsurance() {
+      const inp = document.getElementById("insuranceInput");
+      insuranceCost = Math.max(0, parseInt(inp.value) || 0);
+      inp.value = insuranceCost;
+      inp.style.display = "none";
+      const disp = document.getElementById("insuranceDisplay");
+      disp.textContent = fmt(insuranceCost);
+      disp.style.display = "";
+      recalc();
+    }
+    function cancelInsurance() {
+      document.getElementById("insuranceInput").value = insuranceCost;
+      document.getElementById("insuranceInput").style.display = "none";
+      document.getElementById("insuranceDisplay").style.display = "";
+    }
 
-    const display = document.getElementById("invoiceNoDisplay");
-    // Animate: flash then show new number
-    display.style.transition = "opacity .15s";
-    display.style.opacity = "0";
-    setTimeout(() => {
-      display.textContent = currentInvoiceNo;
-      display.style.opacity = "1";
-    }, 160);
-  }
+    // ── Kupon Diskon Edit ────────────────────────────────────
+    function toggleKuponEdit() {
+      document.getElementById("kuponDiskonDisplay").style.display = "none";
+      const inp = document.getElementById("kuponDiskonInput");
+      inp.style.display = "inline-block";
+      inp.focus();
+      inp.select();
+    }
+    function commitKupon() {
+      const inp = document.getElementById("kuponDiskonInput");
+      kuponDiskon = Math.max(0, parseInt(inp.value) || 0);
+      inp.value = kuponDiskon;
+      inp.style.display = "none";
+      const disp = document.getElementById("kuponDiskonDisplay");
+      disp.textContent = fmt(kuponDiskon);
+      disp.style.display = "";
+      recalc();
+    }
+    function cancelKupon() {
+      document.getElementById("kuponDiskonInput").value = kuponDiskon;
+      document.getElementById("kuponDiskonInput").style.display = "none";
+      document.getElementById("kuponDiskonDisplay").style.display = "";
+    }
 
-  // ── Copy invoice ─────────────────────────────────────────────
-  function copyInvoice() {
-    navigator.clipboard.writeText(currentInvoiceNo).then(() => {
+    // ── Recalc ───────────────────────────────────────────────
+    function recalc() {
+      const sub = products.reduce((s, p) => s + p.qty * p.price, 0);
+      document.getElementById("itemCount").textContent = products.reduce((s, p) => s + p.qty, 0);
+      document.getElementById("subtotalDisplay").textContent = fmt(sub);
+      const grand = sub - kuponDiskon + shippingCost - shippingDiscount + insuranceCost;
+      document.getElementById("grandTotalDisplay").textContent = fmt(Math.max(0, grand));
+    }
+
+    // ── Product Render — Desktop ─────────────────────────────
+    function renderTable() {
+      const tb = document.getElementById("productBody");
+      tb.innerHTML = "";
+      products.forEach((p, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><input class="editable-field" value="${p.name}" data-i="${i}" data-f="name" onfocus="this.classList.add('active')" onblur="this.classList.remove('active');updateField(this)"></td>
+          <td><input class="editable-field" type="number" min="1" value="${p.qty}" data-i="${i}" data-f="qty" onfocus="this.classList.add('active')" onblur="this.classList.remove('active');updateField(this)"></td>
+          <td><input class="editable-field" type="number" min="0" value="${p.price}" data-i="${i}" data-f="price" onfocus="this.classList.add('active')" onblur="this.classList.remove('active');updateField(this)"></td>
+          <td class="total-price">${fmt(p.qty * p.price)}</td>
+          <td><button class="del-row-btn" onclick="delRow(${i})" title="Hapus">✕</button></td>`;
+        tb.appendChild(tr);
+      });
+    }
+
+    // ── Product Render — Mobile Cards ────────────────────────
+    function renderCards() {
+      const wrap = document.getElementById("productCards");
+      wrap.innerHTML = "";
+      products.forEach((p, i) => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <button class="del-card-btn" onclick="delRow(${i})" title="Hapus">✕</button>
+          <div class="pc-name">${p.name}</div>
+          <div class="pc-row"><span class="pc-label">Nama</span>
+            <div class="pc-editable-wrap"><input class="card-field" value="${p.name}" data-i="${i}" data-f="name" onblur="updateField(this)"></div></div>
+          <div class="pc-row"><span class="pc-label">Jumlah</span>
+            <div class="pc-editable-wrap"><input class="card-field" type="number" min="1" value="${p.qty}" data-i="${i}" data-f="qty" onblur="updateField(this)"></div></div>
+          <div class="pc-row"><span class="pc-label">Harga Satuan</span>
+            <div class="pc-editable-wrap"><input class="card-field" type="number" min="0" value="${p.price}" data-i="${i}" data-f="price" onblur="updateField(this)"></div></div>
+          <div class="pc-total"><span class="pc-total-label">Subtotal</span><span class="pc-total-val">${fmt(p.qty * p.price)}</span></div>`;
+        wrap.appendChild(card);
+      });
+    }
+
+    // ── CRUD ──────────────────────────────────────────────────
+    function updateField(el) {
+      const i = +el.dataset.i, f = el.dataset.f;
+      if (f === "name") products[i].name = el.value;
+      else if (f === "qty") products[i].qty = Math.max(1, parseInt(el.value) || 1);
+      else if (f === "price") products[i].price = Math.max(0, parseInt(el.value) || 0);
+      renderAll();
+    }
+    function addRow() {
+      products.push({ name: "Produk Baru", qty: 1, price: 0 });
+      renderAll();
+    }
+    function delRow(i) {
+      if (products.length <= 1) return alert("Minimal satu produk.");
+      products.splice(i, 1);
+      renderAll();
+    }
+    function renderAll() { renderTable(); renderCards(); recalc(); }
+
+    // ── Copy Invoice ─────────────────────────────────────────
+    function copyInvoice() {
+      const no = document.getElementById("invoiceNoDisplay").textContent;
       const btn = document.querySelector(".btn-outline");
       const prev = btn.innerHTML;
-      btn.innerHTML = "✅ Tersalin!";
-      btn.style.background = "#e8f9f0";
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(no).then(() => {
+          btn.innerHTML = "✅ Tersalin!";
+          btn.style.background = "#e8f9f0";
+        }).catch(() => fallbackCopy(no, btn, prev));
+      } else { fallbackCopy(no, btn, prev); }
       setTimeout(() => { btn.innerHTML = prev; btn.style.background = ""; }, 2000);
-    });
-  }
+    }
+    function fallbackCopy(text, btn, prev) {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); btn.innerHTML = "✅ Tersalin!"; btn.style.background = "#e8f9f0"; }
+      catch(e) { btn.innerHTML = "❌ Gagal"; }
+      document.body.removeChild(ta);
+      setTimeout(() => { btn.innerHTML = prev; btn.style.background = ""; }, 2000);
+    }
 
-  // ── Init ─────────────────────────────────────────────────────
-  renderAll();
-</script>
+    // ── Init ─────────────────────────────────────────────────
+    renderAll();
+  </script>
 </body>
 </html>
