@@ -643,13 +643,13 @@
         <div class="product-table-wrap">
           <table class="product-table" id="productTable">
             <thead>
-              <tr>
-                <th style="border-radius:8px 0 0 8px; min-width:200px;">Produk</th>
-                <th style="min-width:70px;">Jumlah</th>
-                <th style="min-width:110px;">Harga Satuan</th>
-                <th style="min-width:110px; border-radius:0 8px 8px 0;">Total Harga</th>
-                <th style="width:30px;"></th>
-              </tr>
+            <tr>
+              <th style="border-radius:8px 0 0 8px; min-width:200px;">Produk</th>
+              <th style="min-width:70px;">Jumlah</th>
+              <th style="min-width:110px;">Harga Satuan</th>
+              <th style="min-width:110px; border-radius:0 8px 8px 0;">Total Harga</th>
+              <th style="width:30px;"></th>
+            </tr>
             </thead>
             <tbody id="productBody"></tbody>
           </table>
@@ -675,11 +675,11 @@
             <span>− </span>
             <span id="kuponDiskonDisplay" class="date-display" onclick="toggleKuponEdit()" title="Klik untuk ubah" style="color:#00AA5B;">Rp0</span>
             <input type="number" id="kuponDiskonInput" min="0" value="0"
-              onblur="commitKupon()" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')cancelKupon();"
-              style="display:none;width:100px;text-align:right;font-size:13px;font-weight:700;color:#00AA5B;
-                     border:none;border-bottom:2px solid #00AA5B;outline:none;background:#f0fdf6;
-                     border-radius:4px 4px 0 0;padding:2px 6px;font-family:inherit;
-                     -moz-appearance:textfield;"/>
+                   onblur="commitKupon()" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')cancelKupon();"
+                   style="display:none;width:100px;text-align:right;font-size:13px;font-weight:700;color:#00AA5B;
+                      border:none;border-bottom:2px solid #00AA5B;outline:none;background:#f0fdf6;
+                      border-radius:4px 4px 0 0;padding:2px 6px;font-family:inherit;
+                      -moz-appearance:textfield;"/>
           </span>
         </div>
         <div class="cost-row">
@@ -695,13 +695,28 @@
           <span class="cost-value neutral">
             <span id="insuranceDisplay" class="date-display" onclick="toggleInsuranceEdit()" title="Klik untuk ubah">Rp3.000</span>
             <input type="number" id="insuranceInput" min="0" value="3000"
-              onblur="commitInsurance()" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')cancelInsurance();"
-              style="display:none;width:90px;text-align:right;font-size:13px;font-weight:700;color:#888;
-                     border:none;border-bottom:2px solid #00AA5B;outline:none;background:#f0fdf6;
-                     border-radius:4px 4px 0 0;padding:2px 6px;font-family:inherit;
-                     -moz-appearance:textfield;"/>
+                   onblur="commitInsurance()" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')cancelInsurance();"
+                   style="display:none;width:90px;text-align:right;font-size:13px;font-weight:700;color:#888;
+                      border:none;border-bottom:2px solid #00AA5B;outline:none;background:#f0fdf6;
+                      border-radius:4px 4px 0 0;padding:2px 6px;font-family:inherit;
+                      -moz-appearance:textfield;"/>
           </span>
         </div>
+
+        <!-- ADDED: Biaya Jasa Aplikasi (editable) -->
+        <div class="cost-row">
+          <span class="cost-label">Biaya Jasa Aplikasi</span>
+          <span class="cost-value neutral">
+            <span id="appFeeDisplay" class="date-display" onclick="toggleAppFeeEdit()" title="Klik untuk ubah">Rp0</span>
+            <input type="number" id="appFeeInput" min="0" value="0"
+                   onblur="commitAppFee()" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')cancelAppFee();"
+                   style="display:none;width:90px;text-align:right;font-size:13px;font-weight:700;color:#888;
+                      border:none;border-bottom:2px solid #00AA5B;outline:none;background:#f0fdf6;
+                      border-radius:4px 4px 0 0;padding:2px 6px;font-family:inherit;
+                      -moz-appearance:textfield;"/>
+          </span>
+        </div>
+
         <hr class="divider">
         <div class="grand-total-box">
           <span class="gt-label">Total Tagihan</span>
@@ -729,7 +744,7 @@
     <button class="btn btn-outline" onclick="copyInvoice()">📋 Salin No. Invoice</button>
   </div>
 
-<script>
+  <script>
     // ── Data ─────────────────────────────────────────────────
     let products = [
       { name: "Produk 1", qty: 1, price: 450000 },
@@ -739,6 +754,7 @@
     let shippingCost = 18000;
     let shippingDiscount = 18000;
     let insuranceCost = 3000;
+    let appFee = 0; // ADDED
     let kuponDiskon = 0;
 
     // ── Helpers ──────────────────────────────────────────────
@@ -792,6 +808,30 @@
       document.getElementById("insuranceDisplay").style.display = "";
     }
 
+    // ── App Fee Edit (ADDED) ─────────────────────────────────
+    function toggleAppFeeEdit() {
+      document.getElementById("appFeeDisplay").style.display = "none";
+      const inp = document.getElementById("appFeeInput");
+      inp.style.display = "inline-block";
+      inp.focus();
+      inp.select();
+    }
+    function commitAppFee() {
+      const inp = document.getElementById("appFeeInput");
+      appFee = Math.max(0, parseInt(inp.value) || 0);
+      inp.value = appFee;
+      inp.style.display = "none";
+      const disp = document.getElementById("appFeeDisplay");
+      disp.textContent = fmt(appFee);
+      disp.style.display = "";
+      recalc();
+    }
+    function cancelAppFee() {
+      document.getElementById("appFeeInput").value = appFee;
+      document.getElementById("appFeeInput").style.display = "none";
+      document.getElementById("appFeeDisplay").style.display = "";
+    }
+
     // ── Kupon Diskon Edit ────────────────────────────────────
     function toggleKuponEdit() {
       document.getElementById("kuponDiskonDisplay").style.display = "none";
@@ -821,7 +861,9 @@
       const sub = products.reduce((s, p) => s + p.qty * p.price, 0);
       document.getElementById("itemCount").textContent = products.reduce((s, p) => s + p.qty, 0);
       document.getElementById("subtotalDisplay").textContent = fmt(sub);
-      const grand = sub - kuponDiskon + shippingCost - shippingDiscount + insuranceCost;
+
+      // ADDED: + appFee
+      const grand = sub - kuponDiskon + shippingCost - shippingDiscount + insuranceCost + appFee;
       document.getElementById("grandTotalDisplay").textContent = fmt(Math.max(0, grand));
     }
 
@@ -862,7 +904,7 @@
       });
     }
 
-    // ── CRUD ──────────────────────────────────────────────────
+    // ── CRUD ─────────────────────────────────────────────────-
     function updateField(el) {
       const i = +el.dataset.i, f = el.dataset.f;
       if (f === "name") products[i].name = el.value;
